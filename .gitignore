@@ -1,0 +1,6 @@
+.project
+.classpath
+.gradle/
+
+build/
+!build/.gitkeep

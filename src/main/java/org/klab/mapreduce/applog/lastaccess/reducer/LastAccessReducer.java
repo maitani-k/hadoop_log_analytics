@@ -1,4 +1,4 @@
-package applogsplitter.reducer;
+package org.klab.mapreduce.applog.lastaccess.reducer;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -12,13 +12,13 @@ import java.util.List;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.log4j.Logger;
+import org.klab.mapreduce.applog.AccessLogWritable;
 
 import com.mongodb.hadoop.io.BSONWritable;
 
-import applogsplitter.writable.AccessLogWritable;
 
 
-public class AppLogLastAccessReducer extends Reducer<IntWritable, AccessLogWritable, IntWritable, BSONWritable> {
+public class LastAccessReducer extends Reducer<IntWritable, AccessLogWritable, IntWritable, BSONWritable> {
 	
 	public static final String FETCH_COUNT_KEY = "applogspliter.reducer.applog_last_access_reducer.fetch_count";
 	
@@ -46,7 +46,7 @@ public class AppLogLastAccessReducer extends Reducer<IntWritable, AccessLogWrita
 					return  (int)(date2.getTime() - date1.getTime());
 					
 				}catch(ParseException e){
-					Logger.getLogger(AppLogLastAccessReducer.class).warn(e.getMessage());
+					Logger.getLogger(LastAccessReducer.class).warn(e.getMessage());
 					return 0;
 				}				
 			}

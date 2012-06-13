@@ -1,11 +1,11 @@
-package applogsplitter.reducer;
+package org.klab.mapreduce.applog.lastaccess.reducer;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.klab.mapreduce.applog.AccessLogWritable;
 
-import applogsplitter.writable.AccessLogWritable;
 
 import com.mongodb.hadoop.io.BSONWritable;
 

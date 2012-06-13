@@ -1,4 +1,4 @@
-package applogsplitter.driver;
+package org.klab.mapreduce.applog.driver;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -8,10 +8,10 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.klab.mapreduce.applog.AccessLogWritable;
+import org.klab.mapreduce.applog.lastaccess.reducer.LastAccessReducer;
+import org.klab.mapreduce.applog.separator.mapper.SeparatorMapper;
 
-import applogsplitter.mapper.AppLogSeparatorMapper;
-import applogsplitter.reducer.AppLogLastAccessReducer;
-import applogsplitter.writable.AccessLogWritable;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -21,7 +21,7 @@ import com.mongodb.hadoop.MongoOutputFormat;
 import com.mongodb.hadoop.io.BSONWritable;
 import com.mongodb.hadoop.util.MongoConfigUtil;
 
-public class Driver extends Configured implements Tool {
+public class SamplingLastAccessDriver extends Configured implements Tool {
 	
 	private static final int DEFAULT_SAMPLING_COUNT = 3;
 	
@@ -47,13 +47,13 @@ public class Driver extends Configured implements Tool {
 		
 		String inputDir         = args[0];
 		String outputCollection = args[1];
-		int samplingCount = Driver.DEFAULT_SAMPLING_COUNT;
+		int samplingCount = SamplingLastAccessDriver.DEFAULT_SAMPLING_COUNT;
 		if(args.length == 3){
 			samplingCount = Integer.parseInt(args[2]);
 		}
 		
 		Job job = new Job(this.getConf(), "applog_sampling_last_access");
-		job.setJarByClass(Driver.class);
+		job.setJarByClass(SamplingLastAccessDriver.class);
 		
 		
 		//setting input from file
@@ -61,7 +61,7 @@ public class Driver extends Configured implements Tool {
 		job.setInputFormatClass(TextInputFormat.class);
 		
 		//setting output to mongodb
-		String mongoDbUri = Driver.OUTPUT_MONGODB_URI;
+		String mongoDbUri = SamplingLastAccessDriver.OUTPUT_MONGODB_URI;
 		MongoURI uri = new MongoURI(mongoDbUri + outputCollection);
 		MongoConfigUtil.setOutputURI(job.getConfiguration(), uri.toString());
 		
@@ -78,16 +78,16 @@ public class Driver extends Configured implements Tool {
 		
 		
 		//setting mapper
-		job.setMapperClass(AppLogSeparatorMapper.class);
+		job.setMapperClass(SeparatorMapper.class);
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(AccessLogWritable.class);
 		
 		
 		//setting reducer
-		job.setReducerClass(AppLogLastAccessReducer.class);
+		job.setReducerClass(LastAccessReducer.class);
 		job.setOutputKeyClass(IntWritable.class);
 		job.setOutputValueClass(BSONWritable.class);
-		job.getConfiguration().setInt(AppLogLastAccessReducer.FETCH_COUNT_KEY, samplingCount);
+		job.getConfiguration().setInt(LastAccessReducer.FETCH_COUNT_KEY, samplingCount);
 		
 		
 		//execute
@@ -100,6 +100,6 @@ public class Driver extends Configured implements Tool {
 	
 	
 	public static void main(String[] args) throws Exception {
-		System.exit(ToolRunner.run(new Configuration(), new Driver(), args));
+		System.exit(ToolRunner.run(new Configuration(), new SamplingLastAccessDriver(), args));
 	}
 }

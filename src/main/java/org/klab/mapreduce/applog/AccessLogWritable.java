@@ -1,4 +1,4 @@
-package applogsplitter.writable;
+package org.klab.mapreduce.applog;
 
 import java.io.DataInput;
 import java.io.DataOutput;

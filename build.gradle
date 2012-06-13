@@ -3,7 +3,7 @@ apply plugin: 'java'
 jar {
 	manifest {
 		attributes \
-			'Main-Class': 'applogsplitter.driver.Driver'
+			'Main-Class': 'org.klab.mapreduce.applog.driver.SamplingLastAccessDriver'
 	}
 }
 

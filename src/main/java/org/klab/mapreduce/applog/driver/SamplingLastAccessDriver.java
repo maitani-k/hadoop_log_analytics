@@ -4,10 +4,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.klab.mapreduce.JobExtended;
 import org.klab.mapreduce.applog.AccessLogWritable;
 import org.klab.mapreduce.applog.lastaccess.reducer.LastAccessReducer;
 import org.klab.mapreduce.applog.separator.mapper.SeparatorMapper;
@@ -52,8 +52,9 @@ public class SamplingLastAccessDriver extends Configured implements Tool {
 			samplingCount = Integer.parseInt(args[2]);
 		}
 		
-		Job job = new Job(this.getConf(), "applog_sampling_last_access");
-		job.setJarByClass(SamplingLastAccessDriver.class);
+		JobExtended job = new JobExtended(
+			this.getConf(), "applog_sampling_last_access", SamplingLastAccessDriver.class
+		);
 		
 		
 		//setting input from file
@@ -78,15 +79,10 @@ public class SamplingLastAccessDriver extends Configured implements Tool {
 		
 		
 		//setting mapper
-		job.setMapperClass(SeparatorMapper.class);
-		job.setMapOutputKeyClass(IntWritable.class);
-		job.setMapOutputValueClass(AccessLogWritable.class);
-		
+		job.setMapperClass(SeparatorMapper.class, IntWritable.class, AccessLogWritable.class);
 		
 		//setting reducer
-		job.setReducerClass(LastAccessReducer.class);
-		job.setOutputKeyClass(IntWritable.class);
-		job.setOutputValueClass(BSONWritable.class);
+		job.setReducerClass(LastAccessReducer.class, IntWritable.class, BSONWritable.class);
 		job.getConfiguration().setInt(LastAccessReducer.FETCH_COUNT_KEY, samplingCount);
 		
 		
